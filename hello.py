@@ -7,5 +7,6 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 	return '<h1>Hello World!</h1>'
+# 确保直接执行这个脚本时才启动开发Web服务器
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True) #启动调试模式设置debug为True
