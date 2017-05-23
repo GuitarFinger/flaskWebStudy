@@ -1,16 +1,25 @@
 #!/usr/bin/env python3
-#-*-coding:utf-8 -*-
+# -*-coding:utf-8 -*-
 __author__ = 'HZC'
 from flask import Flask
-app = Flask(__name__)
+from flask_script import Manager  # 为flask程序添加了一个命令行解析器
 
-#拦截路由
+app = Flask(__name__)  # 程序实例是Flask类的对象，把接收自客户端的所有请求都交给这个对象处理
+
+manager = Manager(app)
+
+
+# 拦截路由
 @app.route('/')
 def index():
-	return '<h1>Hello World!</h1>'
+    return '<h1>Hello World!</h1>'
+
+
+# 动态路由
 @app.route('/user/<name>')
 def user(name):
-	return '<h1>Hello, %s</h1>' % name
-# 确保直接执行这个脚本时才启动开发Web服务器
+    return '<h1>Hello, %s</h1>' % name
+
+
 if __name__ == '__main__':
-	app.run(debug=True) #启动调试模式设置debug为True
+    manager.run()
