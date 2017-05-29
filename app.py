@@ -3,10 +3,12 @@
 __author__ = 'HZC'
 from flask import Flask, render_template  # 渲染模板模块render_template
 from flask_script import Manager  # 为flask程序添加了一个命令行解析器
+from flask_bootstrap import Bootstrap  # 导入bootstrap框架
 
 app = Flask(__name__)  # 程序实例是Flask类的对象，把接收自客户端的所有请求都交给这个对象处理
 
-manager = Manager(app)
+manager = Manager(app)  # manager实例
+bootstrap = Bootstrap(app)  # bookstrap实例
 
 
 # 拦截路由
