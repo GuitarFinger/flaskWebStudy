@@ -11,7 +11,20 @@ manager = Manager(app)  # manager实例
 bootstrap = Bootstrap(app)  # bookstrap实例
 
 
-# 拦截路由
+# -------------------拦截路由---------------------
+
+# 404页面:客户端请求位置页面或路由时显示
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+# 500页面:有未处理的异常时显示
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
