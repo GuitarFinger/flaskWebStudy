@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 # -*-coding:utf-8 -*-
 __author__ = 'HZC'
+from datetime import datetime
 from flask import Flask, render_template  # 渲染模板模块render_template
 from flask_script import Manager  # 为flask程序添加了一个命令行解析器
 from flask_bootstrap import Bootstrap  # 导入bootstrap框架
+from flask_moment import Moment  # 本地化日期和时间
 
 app = Flask(__name__)  # 程序实例是Flask类的对象，把接收自客户端的所有请求都交给这个对象处理
 
 manager = Manager(app)  # manager实例
 bootstrap = Bootstrap(app)  # bookstrap实例
+moment = Moment(app)
 
 
 # -------------------拦截路由---------------------
@@ -27,7 +30,7 @@ def internal_server_error(e):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', current_time=datetime.utcnow())
 
 
 # 动态路由
