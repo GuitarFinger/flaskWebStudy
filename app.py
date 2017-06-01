@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 # -*-coding:utf-8 -*-
 __author__ = 'HZC'
-from flask import Flask, render_template, session, redirect, url_for  # 渲染模板模块render_template
+# 渲染模板模块render_template
+# session 用户会话，是请求上下文中的变量
+# redirect 重定向，参数是重定向的URL
+# url_for URL生成函数,第一个参数是端点名，是相应视图函数的名字
+# flash 提示消息 使用get_flashed_messages() 函数开放给模板,用来获取并渲染消息
+from flask import Flask, render_template, session, redirect, url_for, flash
 from flask_script import Manager  # 为flask程序添加了一个命令行解析器
 from flask_bootstrap import Bootstrap  # 导入bootstrap框架
 from flask_moment import Moment  # 本地化日期和时间
@@ -40,6 +45,9 @@ def internal_server_error(e):
 def index():
     form = NameForm()
     if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name != form.name.data:
+            flash('Looks like you have changed your name!')  # 提示消息
         session['name'] = form.name.data  # 将姓名存在session里面
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'))
