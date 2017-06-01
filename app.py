@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*-coding:utf-8 -*-
 __author__ = 'HZC'
-from flask import Flask, render_template  # 渲染模板模块render_template
+from flask import Flask, render_template, session, redirect, url_for  # 渲染模板模块render_template
 from flask_script import Manager  # 为flask程序添加了一个命令行解析器
 from flask_bootstrap import Bootstrap  # 导入bootstrap框架
 from flask_moment import Moment  # 本地化日期和时间
@@ -38,13 +38,11 @@ def internal_server_error(e):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    name = None
     form = NameForm()
     if form.validate_on_submit():
-        name = form.name.data
-        print(form.name)
-        form.name.data = ''
-    return render_template('index.html', form=form, name=name)
+        session['name'] = form.name.data  # 将姓名存在session里面
+        return redirect(url_for('index'))
+    return render_template('index.html', form=form, name=session.get('name'))
 
 
 if __name__ == '__main__':
