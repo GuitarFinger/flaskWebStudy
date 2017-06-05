@@ -7,7 +7,7 @@ __author__ = 'HZC'
 # url_for URL生成函数,第一个参数是端点名，是相应视图函数的名字
 # flash 提示消息 使用get_flashed_messages() 函数开放给模板,用来获取并渲染消息
 import os  # 操作系统模块
-from flask import Flask, render_template, session, redirect, url_for, flash
+from flask import Flask, render_template, session, redirect, url_for
 from flask_script import Manager, Shell  # 为flask程序添加了一个命令行解析器
 from flask_bootstrap import Bootstrap  # 导入bootstrap框架
 from flask_moment import Moment  # 本地化日期和时间
@@ -16,6 +16,7 @@ from wtforms import StringField, SubmitField  # 表单输入框和提交按钮
 from wtforms.validators import DataRequired  # 表单校验 数据校验
 from flask_sqlalchemy import SQLAlchemy  # 数据库
 from flask_migrate import Migrate, MigrateCommand  # 数据库迁移
+from flask_mail import Mail, Message
 
 basedir = os.path.abspath(os.path.dirname(__file__))  # 返回脚本的路径
 
@@ -25,6 +26,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = \
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')  # 保存数据库url
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True  # 每次请求结束后都会自动提交数据库中得变动
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAIL_SERVER'] = 'smtp.qq.com'  # 传输邮箱
+app.config['MAIL_PORT'] = 587  # 端口号
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')  # 邮箱 配置在系统环境变量中
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # 密码 配置在系统环境变量中
+app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[Flasky]'
+app.config['FLASKY_MAIL_SENDER'] = '815547360@qq.com'
+app.config['FLASKY_ADMIN'] = '815547360@qq.com'
 
 # 实例对象
 manager = Manager(app)
@@ -32,6 +41,7 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
 
 
 # ----------------------类-----------------------
@@ -48,10 +58,20 @@ class Role(db.Model):
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, db.ForeignKey('roles.id'))  # 外键
+    username = db.Column(db.String(64), unique=True, index=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))  # 外键
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+# 参数： 收件人地址
+def send_email(to, subject, template, **kwargs):
+    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
+                  sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    mail.send(msg)
 
 
 class NameForm(FlaskForm):
@@ -88,6 +108,9 @@ def index():
             user = User(username=form.name.data)
             db.session.add(user)
             session['known'] = False
+            if app.config['FLASKY_ADMIN']:
+                print('hello')
+                send_email(app.config['FLASKY_ADMIN'], 'New User', 'mail/new_user', user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
