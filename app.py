@@ -8,7 +8,7 @@ __author__ = 'HZC'
 # flash 提示消息 使用get_flashed_messages() 函数开放给模板,用来获取并渲染消息
 import os  # 操作系统模块
 from flask import Flask, render_template, session, redirect, url_for, flash
-from flask_script import Manager  # 为flask程序添加了一个命令行解析器
+from flask_script import Manager, Shell  # 为flask程序添加了一个命令行解析器
 from flask_bootstrap import Bootstrap  # 导入bootstrap框架
 from flask_moment import Moment  # 本地化日期和时间
 from flask_wtf import FlaskForm  # 表单
@@ -55,6 +55,12 @@ class User(db.Model):
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+
+# 把对象添加到导入列表中，为shell命令注册一个make_context回调函数
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role)
+manager.add_command("shell", Shell(make_context=make_shell_context))
 
 
 # -------------------拦截路由---------------------
