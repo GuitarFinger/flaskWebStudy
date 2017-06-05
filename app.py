@@ -7,6 +7,7 @@ __author__ = 'HZC'
 # url_for URL生成函数,第一个参数是端点名，是相应视图函数的名字
 # flash 提示消息 使用get_flashed_messages() 函数开放给模板,用来获取并渲染消息
 import os  # 操作系统模块
+from threading import Thread  # 引入线程
 from flask import Flask, render_template, session, redirect, url_for
 from flask_script import Manager, Shell  # 为flask程序添加了一个命令行解析器
 from flask_bootstrap import Bootstrap  # 导入bootstrap框架
@@ -65,13 +66,21 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 
-# 参数： 收件人地址
+# 异步发送邮件
+def send_async_email(app, msg):
+    with app.app_context():  # 注册上下文
+        mail.send(msg)
+
+
+# 参数： 收件人地址、主题、渲染邮件正文的模板、关键字参数列表
 def send_email(to, subject, template, **kwargs):
     msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
                   sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
     msg.body = render_template(template + '.txt', **kwargs)
     msg.html = render_template(template + '.html', **kwargs)
-    mail.send(msg)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    return thr
 
 
 class NameForm(FlaskForm):
