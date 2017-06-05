@@ -34,19 +34,19 @@ db = SQLAlchemy(app)
 
 # ----------------------类-----------------------
 class Role(db.Model):
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'roles'  # 表名
+    id = db.Column(db.Integer, primary_key=True)  # 列
     name = db.Column(db.String(64), unique=True)
     users = db.relationship('User', backref='role', lazy='dynamic')
 
-    def __repr__(self):
+    def __repr__(self):  # 自动调用函数 返回一个对象
         return '<Role %r>' % self.name
 
 
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, db.ForeignKey('roles.id'))
+    username = db.Column(db.String, db.ForeignKey('roles.id'))  # 外键
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -74,13 +74,16 @@ def internal_server_error(e):
 def index():
     form = NameForm()
     if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash('Looks like you have changed your name!')  # 提示消息
-        session['name'] = form.name.data  # 将姓名存在session里面
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)
+            db.session.add(user)
+            session['known'] = False
+        else:
+            session['known'] = True
+        session['name'] = form.name.data
         return redirect(url_for('index'))
-    return render_template('index.html', form=form, name=session.get('name'))
-
+    return render_template('index.html', form=form, name=session.get('name'), known=session.get('known', False))
 
 if __name__ == '__main__':
     db.create_all()
