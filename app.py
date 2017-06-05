@@ -15,6 +15,7 @@ from flask_wtf import FlaskForm  # 表单
 from wtforms import StringField, SubmitField  # 表单输入框和提交按钮
 from wtforms.validators import DataRequired  # 表单校验 数据校验
 from flask_sqlalchemy import SQLAlchemy  # 数据库
+from flask_migrate import Migrate, MigrateCommand  # 数据库迁移
 
 basedir = os.path.abspath(os.path.dirname(__file__))  # 返回脚本的路径
 
@@ -30,6 +31,7 @@ manager = Manager(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 # ----------------------类-----------------------
@@ -60,7 +62,8 @@ class NameForm(FlaskForm):
 # 把对象添加到导入列表中，为shell命令注册一个make_context回调函数
 def make_shell_context():
     return dict(app=app, db=db, User=User, Role=Role)
-manager.add_command("shell", Shell(make_context=make_shell_context))
+manager.add_command("shell", Shell(make_context=make_shell_context))  # 定制shell
+manager.add_command('db', MigrateCommand)
 
 
 # -------------------拦截路由---------------------
