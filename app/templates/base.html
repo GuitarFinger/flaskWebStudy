@@ -1,10 +1,9 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Flask{% endblock %}
+{% block title %}Flasky{% endblock %}
 
 {% block head %}
 {{ super() }}
-{#设置标签页图标#}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 {% endblock %}
@@ -19,11 +18,11 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="">Flask</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">Flasky</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
+                <li><a href="{{ url_for('main.index') }}">Home</a></li>
             </ul>
         </div>
     </div>
@@ -43,7 +42,6 @@
 </div>
 {% endblock %}
 
-{#引入moment.js库#}
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
