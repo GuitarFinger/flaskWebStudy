@@ -16,11 +16,11 @@ def make_shell_context():
     return dict(app=app, db=db, User=User, Role=Role)
 
 
-manger.add_command("shell", Shell(make_context=make_shell_context))
-manger.add_command('db', MigrateCommand)
+manager.add_command("shell", Shell(make_context=make_shell_context))
+manager.add_command('db', MigrateCommand)
 
 
-@manger.command
+@manager.command
 def test():
     """Run the unit tests."""
     import unittest
