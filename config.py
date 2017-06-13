@@ -8,7 +8,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))  # 获取当前脚本路径
 
 # 基类Config包含通用配置
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string.'  # 密钥
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'  # 密钥
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True  # 请求结束后都会自动提交数据库中的变动
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # 将会追踪对象的修改并且发送信号,默认为True
     MAIL_SERVER = 'smtp.qq.com'  # SMTP(简单邮箱传输协议)服务器地址(端口465或587)
